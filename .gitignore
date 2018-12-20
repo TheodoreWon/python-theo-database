@@ -1,0 +1,11 @@
+# python temporary folder
+__pycache__
+
+# PyPI generated folder
+dist/
+theo_database.egg-info/
+build/
+
+# framework creation folder
+configs/
+files/
