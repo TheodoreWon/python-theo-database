@@ -5,25 +5,28 @@ class MongoDB:
     """
     MongoDB supports the functionality to control the Mongo database.
 
-
     Methods:
-        Mongo(check_connection=False)
+        Mongo(check_connection=False) : connecting Mongo database client
 
-        get_databases()
-        get_collections(database)
-        is_database_exist(database)
-        is_collection_exist(database, collection)
+        databases = get_databases() : getting databases
+        collections = get_collections(database) : getting collections of argument database
+        is_exist = is_database_exist(database) : check a existence of argument database
+        is_exist = is_collection_exist(database, collection) : check a existence of argument collection
 
-        drop_database(database)
-        drop_collection(database, collection)
+        drop_database(database) : droping argument database
+        drop_collection(database, collection) : droping argument collection
 
-        save_data(database, collection, data, unique_key)
-        load_data(database, collection, sorting_key=None, keys=None, range=None)
-        get_keys(database, collection)
-        get_range(database, collection, key)
+        save_data(database, collection, data, unique_key=None) : saving argument data in the database
+        data = load_data(database, collection, sorting_key=None, keys=None, range=None) : loading data from the database
+        keys = get_keys(database, collection) : getting the keys of the first datum in the database
+        range = get_range(database, collection, key) : getting range of the value for argument key
 
     Arguments:
         range (range dictionary): key, min(option), max(option)
+
+    Example:
+        mongodb = MongoDB(check_connection=True)
+        print(mongodb.get_databases())
     """
 
     def __init__(self, check_connection=False):
@@ -131,7 +134,7 @@ class MongoDB:
         end = self.client[database][collection].find_one(
             projection=self.get_projection([key]), sort=[(key, pymongo.DESCENDING)])
 
-        if key not in start or key not in end:
+        if start is None or end is None or key not in start or key not in end:
             return None
 
         return {'key': key, 'start': start[key], 'end': end[key]}

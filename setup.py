@@ -2,8 +2,8 @@ import setuptools
 
 setuptools.setup(
     name='theo-database',
-    version='0.0.1',
-    install_requires=["theo-framework", "pymongo"],
+    version='0.0.2',
+    install_requires=['setuptools', 'wheel', 'twine', 'theo-framework', 'pymongo'],
     url='https://github.com/TheodoreWon/python-theo-database',
     license='MIT',
     author='Theodore Won',
@@ -16,6 +16,7 @@ setuptools.setup(
 )
 
 '''
+NOTE: How to make a package and release the software
 1. python setup.py bdist_wheel
 2. cd dist
 3. twine upload xxx.whl

@@ -3,8 +3,34 @@ from theo.src.database.MongoDB import MongoDB
 
 
 class MongoDBCtrl(Component):
+    '''
+    MongoDBCtrl is just interface Component to use MongoDB.
+
+    If many points make new MongoDB and have connections to Mongo database,
+        the database client could make a delay to open the connection
+        because of the limitation of connection number.
+    To avoid this issue, this component opens a connection and provices interfaces.
+
+    Interfaces:
+        System.execute_interface('MongoDBCtrl', 'get_databases')
+        System.execute_interface('MongoDBCtrl', 'get_collections')
+        ...
+
+        Supported interfaces are same with the API of MongoDB.
+        MongoDBCtrl is only for the connection control.
+
+    Example:
+        from theo.framework import System
+        from theo.database import MongoDBCtrl
+
+        System.register_component(MongoDBCtrl)
+        System.startup_components()
+
+        print(System.execute_interface('MongoDBCtrl', 'get_databases'))
+    '''
+
     def initial(self):
-        self.log.print('info', 'initial (related:{})'.format(self.related_components))
+        self.log.print('info', 'initial')
 
         self.db_handler = MongoDB()
 

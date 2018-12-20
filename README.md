@@ -13,8 +13,9 @@ Install the database
 > pip install theo-database
 
 Print docstrings
-> from theo.database import MongoDB
-> print(MongoDB.&#95;&#95;doc&#95;&#95;)    
+> from theo.database import MongoDB  
+> print(MongoDB.&#95;&#95;doc&#95;&#95;)
+> print(MongoDBCtrl.&#95;&#95;doc&#95;&#95;)
 
 
 # Authors
