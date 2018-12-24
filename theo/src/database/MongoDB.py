@@ -22,7 +22,7 @@ class MongoDB:
         range = get_range(database, collection, key) : getting range of the value for argument key
 
     Arguments:
-        range (range dictionary): key, min(option), max(option)
+        range (dict): key, min(option), max(option)
 
     Example:
         mongodb = MongoDB(check_connection=True)
@@ -42,7 +42,7 @@ class MongoDB:
                 self.client.admin.command('ismaster')
             except pymongo.errors.ServerSelectionTimeoutError:
                 self.client = None
-                raise AssertionError('[theo.database.MongoDB] The client is not ready.')
+                raise AssertionError('[theo.database.MongoDB] error: The client is not ready.')
 
     def __del__(self):
         if self.client is not None:
