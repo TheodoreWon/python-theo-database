@@ -26,6 +26,27 @@ Print docstrings
 > print(MongoDBCtrl.&#95;&#95;doc&#95;&#95;)
 
 
+# How to setup the MongoDB
+
+Step 1. Download  
+> Open the website, https://www.mongodb.com/  
+> Find and click the 'Get MongoDB' button from top of the page  
+> Select 'Server' of the list Cloud, Server, Tools  
+> Check the environment, Version, OS, Package and click the 'Download' button  
+
+Step 2. Install  
+> Execute the installer what is downloaded  
+> Follow the install steps and un-check 'Install MongoDB Compass'  
+
+Step 3. Set the MongoDB as the service in Windows  
+> Make new folder like C:\Users\wonta\mongodb  
+> Run cmd (command prompt) as Administrator  
+> Go to the MongoDB location like C:\Program Files\MongoDB\Server\4.0\bin  
+> Enter the command 'mongod --remove'  
+> Enter the command 'mongod --dbpath=C:\Users\wonta\mongodb --logpath=C:\Users\wonta\mongodb\log.txt --install'  
+> Restart the windows
+
+
 # Authors
 
 Theodore Won - Owner of this project

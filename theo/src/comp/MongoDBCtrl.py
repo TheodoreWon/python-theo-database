@@ -32,7 +32,7 @@ class MongoDBCtrl(Component):
     def initial(self):
         self.log.print('info', 'initial')
 
-        self.db_handler = MongoDB()
+        self.db_handler = MongoDB(check_connection=True)
 
         System.register_interface('MongoDBCtrl', 'get_databases', [0], self.get_databases)
         System.register_interface('MongoDBCtrl', 'get_collections', [1], self.get_collections)
