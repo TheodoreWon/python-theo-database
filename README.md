@@ -25,6 +25,46 @@ Print docstrings
 > print(MongoDB.&#95;&#95;doc&#95;&#95;)  
 > print(MongoDBCtrl.&#95;&#95;doc&#95;&#95;)
 
+Simple example
+> ''' import theo-database, MongoDB '''  
+> from theo.database import MongoDB  
+> mongodb = MongoDB(check_connection=True)  
+
+> ''' print databases '''  
+> databases = mongodb.get_databases()  
+> print('databases:{}'.format(databases))  
+>> databases:['Athena', 'admin', 'config', 'local']  
+
+> ''' print collections '''  
+> for database in databases:  
+>     collections = mongodb.get_collections(database)  
+>     print('database({}) collections:{}'.format(database, collections))  
+>> database(admin) collections:['system.version']  
+>> database(config) collections:['system.sessions']  
+>> database(local) collections:['startup_log']  
+
+> ''' print existence '''  
+> print('theo-database/example exist:{}'.format(mongodb.is_database_exist('theo-database')))  
+> print('theo-database/example exist:{}'.format(mongodb.is_collection_exist('theo-database', 'example')))  
+>> theo-database/example exist:False  
+>> theo-database/example exist:False  
+
+> ''' save and load data '''  
+> mongodb.save_data('theo-database', 'example', [{'text': 'Hello, theo-database.'}, {'text': 'Thank you for using.'}])  
+> print('theo-database/example exist:{}'.format(mongodb.is_database_exist('theo-database')))  
+> print('theo-database/example exist:{}'.format(mongodb.is_collection_exist('theo-database', 'example')))  
+> print(mongodb.load_data('theo-database', 'example'))  
+>> theo-database/example exist:True  
+>> theo-database/example exist:True  
+>> [{'text': 'Hello, theo-database.'}, {'text': 'Thank you for using.'}]  
+
+> ''' drop collection '''  
+> mongodb.drop_collection('theo-database', 'example')  
+> print('theo-database/example exist:{}'.format(mongodb.is_database_exist('theo-database')))  
+> print('theo-database/example exist:{}'.format(mongodb.is_collection_exist('theo-database', 'example')))  
+>> theo-database/example exist:False  
+>> theo-database/example exist:False  
+
 
 # How to setup the MongoDB
 

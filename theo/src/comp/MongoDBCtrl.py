@@ -32,7 +32,7 @@ class MongoDBCtrl(Component):
     def initial(self):
         self.log.print('info', 'initial')
 
-        self.db_handler = MongoDB(check_connection=True)
+        self.mongodb = MongoDB(check_connection=True)
 
         System.register_interface('MongoDBCtrl', 'get_databases', [0], self.get_databases)
         System.register_interface('MongoDBCtrl', 'get_collections', [1], self.get_collections)
@@ -48,31 +48,31 @@ class MongoDBCtrl(Component):
         System.register_interface('MongoDBCtrl', 'get_range', [3], self.get_range)
 
     def get_databases(self):
-        return self.db_handler.get_databases()
+        return self.mongodb.get_databases()
 
     def get_collections(self, database):
-        return self.db_handler.get_collections(database)
+        return self.mongodb.get_collections(database)
 
     def is_database_exist(self, database):
-        return self.db_handler.is_database_exist(database)
+        return self.mongodb.is_database_exist(database)
 
     def is_collection_exist(self, database, collection):
-        return self.db_handler.is_collection_exist(database, collection)
+        return self.mongodb.is_collection_exist(database, collection)
 
     def drop_database(self, database):
-        self.db_handler.drop_database(database)
+        self.mongodb.drop_database(database)
 
     def drop_collection(self, database, collection):
-        self.db_handler.drop_collection(database, collection)
+        self.mongodb.drop_collection(database, collection)
 
     def save_data(self, database, collection, data, unique_key=None):
-        self.db_handler.save_data(database, collection, data, unique_key)
+        self.mongodb.save_data(database, collection, data, unique_key)
 
     def load_data(self, database, collection, sorting_key=None, keys=None, range=None):
-        return self.db_handler.load_data(database, collection, sorting_key, keys, range)
+        return self.mongodb.load_data(database, collection, sorting_key, keys, range)
 
     def get_keys(self, database, collection):
-        return self.db_handler.get_keys(database, collection)
+        return self.mongodb.get_keys(database, collection)
 
     def get_range(self, database, collection, key):
-        return self.db_handler.get_range(database, collection, key)
+        return self.mongodb.get_range(database, collection, key)
