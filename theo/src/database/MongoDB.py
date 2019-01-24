@@ -77,7 +77,8 @@ class MongoDB:
             if unique_key is None:
                 try:
                     self.client[database][collection].insert_many(data)
-                except pymongo.errors.BulkWriteError:
+                except pymongo.errors.BulkWriteError as bulk_write_error:
+                    print('[theo.framework.MongoDB] reason: {}'.format(bulk_write_error.details))
                     raise AssertionError(
                         '[theo.framework.MongoDB] error: Fail to save data, because of the duplication.')
 
@@ -91,7 +92,8 @@ class MongoDB:
 
             try:
                 self.client[database][collection].insert_many(data)
-            except pymongo.errors.BulkWriteError:
+            except pymongo.errors.BulkWriteError as bulk_write_error:
+                print('[theo.framework.MongoDB] reason: {}'.format(bulk_write_error.details))
                 raise AssertionError('[theo.framework.MongoDB] error: Fail to save data, because of the duplication.')
 
     def load_data(self, database, collection, sorting_key=None, keys=None, range=None):
