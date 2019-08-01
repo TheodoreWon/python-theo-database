@@ -51,10 +51,10 @@ Simple example
 >> theo-database/example exist:False  
 
 > ''' save and load data '''  
-> mongodb.save_data('theo-database', 'example', [{'text': 'Hello, theo-database.'}, {'text': 'Thank you for using.'}])  
+> mongodb.insert('theo-database', 'example', [{'text': 'Hello, theo-database.'}, {'text': 'Thank you for using.'}])  
 > print('theo-database/example exist:{}'.format(mongodb.is_database_exist('theo-database')))  
 > print('theo-database/example exist:{}'.format(mongodb.is_collection_exist('theo-database', 'example')))  
-> print(mongodb.load_data('theo-database', 'example'))  
+> print(mongodb.select('theo-database', 'example'))  
 >> theo-database/example exist:True  
 >> theo-database/example exist:True  
 >> [{'text': 'Hello, theo-database.'}, {'text': 'Thank you for using.'}]  

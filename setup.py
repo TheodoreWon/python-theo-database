@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name='theo-database',
-    version='1.0.2',
+    version='2.0.0',
     install_requires=['theo-framework', 'pymongo'],
     url='https://github.com/TheodoreWon/python-theo-database',
     license='MIT',

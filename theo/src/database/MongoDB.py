@@ -6,7 +6,7 @@ class MongoDB:
     MongoDB supports the functionality to control the Mongo database.
 
     Methods:
-        Mongo(check_connection=False) : connecting Mongo database client
+        Mongo() : connecting Mongo database client
 
         databases = get_databases() : getting databases
         collections = get_collections(database) : getting collections of argument database
@@ -16,164 +16,150 @@ class MongoDB:
         drop_database(database) : droping argument database
         drop_collection(database, collection) : droping argument collection
 
-        save_data(database, collection, data, unique_key=None) : saving argument data in the database
-        data = load_data(database, collection, sorting_key=None, keys=None, range=None) : loading data from the database
-        keys = get_keys(database, collection) : getting the keys of the first datum in the database
-        range = get_range(database, collection, key) : getting range of the value for argument key
-
-    Arguments:
-        range (dict): key, min(option), max(option)
+        insert(database, collection, list, unique_key=None) : saving argument data in the database
+        list = select(database, collection, sorting_key=None, keys=None, range_filter=None) : loading data
+            range_filter (dict): key, min(option), max(option)
+        keys = keys(database, collection) : getting the keys of the first datum in the database
+        range_filter = get_range_filter(database, collection, key) : getting range of the value for argument key
 
     Example:
-        mongodb = MongoDB(check_connection=True)
+        mongodb = MongoDB()
         print(mongodb.get_databases())
     """
 
-    def __init__(self, check_connection=False):
-        if not isinstance(check_connection, bool):
-            raise AssertionError(
-                '[theo.framework.MongoDB] error: check_connection(type:{}) should be bool.'.format(
-                    type(check_connection)))
-
-        self.client = pymongo.MongoClient()
-
-        if check_connection:
-            try:
-                self.client.admin.command('ismaster')
-            except pymongo.errors.ServerSelectionTimeoutError:
-                self.client = None
-                raise AssertionError('[theo.database.MongoDB] error: The client is not ready.')
+    def __init__(self):
+        try:
+            self.client = pymongo.MongoClient()
+            self.client.admin.command('ismaster')
+        except Exception as error:
+            print(f'error: {error} / MongoDB()')
+            self.client = None
 
     def __del__(self):
-        if self.client is not None:
-            self.client.close()
+        try:
+            if self.client:
+                self.client.close()
+        except Exception as error:
+            print(f'error: {error} / del mongodb')
 
     def get_databases(self):
-        return list(self.client.database_names())
-
-    def get_collections(self, database):
-        return list(self.client[database].collection_names())
-
-    def is_database_exist(self, database):
-        return True if database in self.client.database_names() else False
-
-    def is_collection_exist(self, database, collection):
-        self.validate_mongodb(database, collection)
-
-        return True if collection in self.client[database].collection_names() else False
-
-    def drop_database(self, database):
-        self.client.drop_database(database)
-
-    def drop_collection(self, database, collection):
-        self.validate_mongodb(database, collection)
-
-        self.client[database].drop_collection(collection)
-
-    def save_data(self, database, collection, data, unique_key=None):
-        self.validate_mongodb(database, collection)
-
-        if self.is_collection_exist(database, collection):
-            if unique_key is None:
-                try:
-                    self.client[database][collection].insert_many(data)
-                except pymongo.errors.BulkWriteError as bulk_write_error:
-                    print('[theo.framework.MongoDB] reason: {}'.format(bulk_write_error.details))
-                    raise AssertionError(
-                        '[theo.framework.MongoDB] error: Fail to save data, because of the duplication.')
-
-            else:
-                for datum in data:
-                    self.client[database][collection].find_one_and_update(
-                        {unique_key: datum[unique_key]}, {'$set': datum}, upsert=True)
-        else:
-            if unique_key is not None:
-                self.client[database][collection].create_index([(unique_key, pymongo.ASCENDING)], unique=True)
-
-            try:
-                self.client[database][collection].insert_many(data)
-            except pymongo.errors.BulkWriteError as bulk_write_error:
-                print('[theo.framework.MongoDB] reason: {}'.format(bulk_write_error.details))
-                raise AssertionError('[theo.framework.MongoDB] error: Fail to save data, because of the duplication.')
-
-    def load_data(self, database, collection, sorting_key=None, keys=None, range=None):
-        self.validate_mongodb(database, collection)
-        self.validate_range(range)
-
-        if not self.is_collection_exist(database, collection):
+        try:
+            return self.client.database_names()
+        except Exception as error:
+            print(f'error: {error} / mongodb.get_databases()')
             return list()
 
-        range_condition = dict()
+    def get_collections(self, database):
+        try:
+            return self.client[database].collection_names()
+        except Exception as error:
+            print(f'error: {error} / mongodb.get_collections(database:{database}/{type(database)})')
+            return list()
 
-        if range is not None:
-            if 'min' in range:
-                range_condition['$gte'] = range.get('min')
+    def is_database_exist(self, database):
+        try:
+            return True if database in self.client.database_names() else False
+        except Exception as error:
+            print(f'error: {error} / mongodb.is_database_exist(database:{database}/{type(database)})')
+            return False
 
-            if 'max' in range:
-                range_condition['$lte'] = range.get('max')
+    def is_collection_exist(self, database, collection):
+        try:
+            return True if collection in self.client[database].collection_names() else False
+        except Exception as error:
+            print(f'error: {error} / mongodb.is_collection_exist(database:{database}/{type(database)},',
+                  f'collection:{collection}/{type(collection)})')
+            return False
 
-        cursor = self.client[database][collection].find(
-            sort=None if sorting_key is None else [(sorting_key, pymongo.ASCENDING)],
-            projection=self.get_projection(keys),
-            filter=None if range is None else {range.get('key'): range_condition})
+    def drop_database(self, database):
+        try:
+            self.client.drop_database(database)
+        except Exception as error:
+            print(f'error: {error} / mongodb.drop_database(database:{database}/{type(database)})')
 
-        return list(cursor)
+    def drop_collection(self, database, collection):
+        try:
+            self.client[database].drop_collection(collection)
+        except Exception as error:
+            print(f'error: {error} / mongodb.drop_collection(database:{database}/{type(database)},',
+                  f'collection:{collection}/{type(collection)})')
 
-    def get_keys(self, database, collection):
-        self.validate_mongodb(database, collection)
+    def insert(self, database, collection, data, unique_key=None):
+        try:
+            if collection not in self.client[database].collection_names() and unique_key:
+                self.client[database][collection].create_index([(unique_key, pymongo.ASCENDING)], unique=True)
 
-        return list() if not self.is_collection_exist(database, collection) \
-            else list(self.client[database][collection].find_one(projection=self.get_projection()).keys())
+            if collection in self.client[database].collection_names() and unique_key:
+                for element in data:
+                    self.client[database][collection].find_one_and_update(
+                        {unique_key: element[unique_key]}, {'$set': element}, upsert=True)
+            else:
+                self.client[database][collection].insert_many(data)
+        except Exception as error:
+            print(f'error: {error} / mongodb.insert(database:{database}/{type(database)},',
+                  f'collection:{collection}/{type(collection)},')
+            print(f'                                   unique_key:{unique_key}/{type(unique_key)},',
+                  f'data:{data}/{type(data)}')
 
-    def get_range(self, database, collection, key):
-        self.validate_mongodb(database, collection)
+    def select(self, database, collection, sorting_key=None, keys=None, range_filter=None):
+        try:
+            if collection not in self.client[database].collection_names():
+                return list()
 
-        if not self.is_collection_exist(database, collection):
+            find_filter = dict()
+            if range_filter and 'min' in range_filter:
+                find_filter['$gte'] = range_filter['min']
+            if range_filter and 'max' in range_filter:
+                find_filter['$lte'] = range_filter['max']
+
+            return list(self.client[database][collection].find(
+                        sort=[(sorting_key, pymongo.ASCENDING)] if sorting_key else None,
+                        projection=self.get_projection(keys),
+                        filter={range_filter['key']: find_filter} if range_filter else None))
+        except Exception as error:
+            print(f'error: {error} / mongodb.select(database:{database}/{type(database)},',
+                  f'collection:{collection}/{type(collection)},')
+            print(f'                                sorting_key:{sorting_key}/{type(sorting_key)},',
+                  f'keys:{keys}/{type(keys)}')
             return None
 
-        start = self.client[database][collection].find_one(
-            projection=self.get_projection([key]), sort=[(key, pymongo.ASCENDING)])
-        end = self.client[database][collection].find_one(
-            projection=self.get_projection([key]), sort=[(key, pymongo.DESCENDING)])
-
-        if start is None or end is None or key not in start or key not in end:
+    def keys(self, database, collection):
+        try:
+            return None if collection not in self.client[database].collection_names() \
+                else list(self.client[database][collection].find_one(projection=self.get_projection()).keys())
+        except Exception as error:
+            print(f'error: {error} / mongodb.keys(database:{database}/{type(database)},',
+                  f'collection:{collection}/{type(collection)})')
             return None
 
-        return {'key': key, 'start': start[key], 'end': end[key]}
+    def get_range_filter(self, database, collection, key):
+        try:
+            if collection not in self.client[database].collection_names():
+                return None
+
+            start = self.client[database][collection].find_one(
+                projection=self.get_projection([key]), sort=[(key, pymongo.ASCENDING)])
+            end = self.client[database][collection].find_one(
+                projection=self.get_projection([key]), sort=[(key, pymongo.DESCENDING)])
+
+            if not start or not end or key not in start or key not in end:
+                return None
+
+            return {'key': key, 'min': start[key], 'max': end[key]}
+        except Exception as error:
+            print(f'error: {error} / mongodb.range_filter(database:{database}/{type(database)},',
+                  f'collection:{collection}/{type(collection)}, key:{key}/{type(key)})')
+            return None
 
     @staticmethod
     def get_projection(keys=None):
-        projection = {'_id': False}
+        try:
+            projection = {'_id': False}
 
-        if keys is None:
-            keys = {}
+            if keys:
+                for key in keys:
+                    projection[key] = True
 
-        for key in keys:
-            projection[key] = True
-
-        return projection
-
-    """
-    Internal validation functions
-    """
-    @staticmethod
-    def validate_mongodb(database, collection):
-        if not isinstance(database, str):
-            raise AssertionError(
-                '[theo.database.MongoDB] error: database(type:{}) should be str.'.format(type(database)))
-
-        if not isinstance(collection, str):
-            raise AssertionError(
-                '[theo.database.MongoDB] error: collection(type:{}) should be str.'.format(type(collection)))
-
-    @staticmethod
-    def validate_range(range):
-        if range is not None:
-            if not isinstance(range, dict):
-                raise AssertionError(
-                    '[theo.database.MongoDB] error: range(type:{}) should be dict.'.format(type(range)))
-
-            if not ('key' in range and ('min' in range or 'max' in range)):
-                raise AssertionError(
-                    '[theo.database.MongoDB] error: range(keys:{}) does not have key or min, max.'.format(
-                        list(filter.keys())))
+            return projection
+        except Exception as error:
+            print(f'error: {error} / MongoDB.get_projection(keys:{keys}/{type(keys)})')

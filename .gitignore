@@ -1,5 +1,7 @@
 # python temporary folder
 __pycache__
+.vscode/
+test.py
 
 # PyPI generated folder
 dist/
